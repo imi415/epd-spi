@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 typedef enum { EPD_OK = 0, EPD_FAIL } epd_ret_t;
 
@@ -20,8 +21,5 @@ typedef struct {
     uint32_t y_start;
     uint32_t y_end;
 } epd_coord_t;
-
-#define EPD_ASSERT(x) if(!(x)) for(;;) { /* ABORT. */}
-#define EPD_ERROR_CHECK(x) if(x != EPD_OK) return EPD_FAIL
 
 #endif

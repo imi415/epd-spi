@@ -1,4 +1,4 @@
-#include "epd_common.h"
+#include "epd_private.h"
 
 /**
  * @brief Execute command sequence.

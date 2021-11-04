@@ -1,4 +1,4 @@
-#include "epd_wfh0420cz35.h"
+#include "epd_panel_wfh0420cz35.h"
 
 #include "epd_private.h"
 
@@ -9,6 +9,13 @@ static uint8_t epd_wfh0420_init_sequence[] = {
     0x03, 0x06, 0x17, 0x17, 0x17,
 };
 
+/**
+ * @brief This function initialize the driver IC and
+ * enable internal power supplies.
+ *
+ * @param epd pointer to epd_wfh0420_t
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 static epd_ret_t epd_wfh0420_init(epd_wfh0420_t *epd) {
     EPD_ASSERT(epd);
     EPD_ASSERT(epd->cb.reset_cb);
@@ -34,6 +41,14 @@ static epd_ret_t epd_wfh0420_init(epd_wfh0420_t *epd) {
     return EPD_OK;
 }
 
+/**
+ * @brief Enable partial mode for UC8176 IC
+ * and set partial mode window.
+ *
+ * @param epd pointer to epd_wfh0420_t
+ * @param coord pointer to epd_coord_t
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 static epd_ret_t epd_wfh0420_partial(epd_wfh0420_t *epd, epd_coord_t *coord) {
     EPD_ASSERT(epd);
     EPD_ASSERT(epd->cb.write_command_cb);
@@ -52,12 +67,21 @@ static epd_ret_t epd_wfh0420_partial(epd_wfh0420_t *epd, epd_coord_t *coord) {
     tx_buf[6] = coord->y_start & 0xFFU;
     tx_buf[7] = (coord->y_end >> 8U) & 0x01U;
     tx_buf[8] = coord->y_end & 0xFFU;
-    tx_buf[9] = 0x01; // Only scan partial area.
+    tx_buf[9] = 0x01;  // Only scan partial area.
     EPD_ERROR_CHECK(epd->cb.write_command_cb(epd->user_data, tx_buf, 10));
 
     return EPD_OK;
 }
 
+/**
+ * @brief Issue UC8176 DTM1 or DTM2 command, with payload data and stop command.
+ *
+ * @param epd pointer to epd_wfh0420_t
+ * @param dtm_num DTM1 or DTM2
+ * @param data payload pixel data
+ * @param len payload data length, calculated as bytes
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 static epd_ret_t epd_wfh0420_dtm(epd_wfh0420_t *epd, uint8_t dtm_num, uint8_t *data, uint32_t len) {
     EPD_ASSERT(epd);
     EPD_ASSERT(epd->cb.write_command_cb);
@@ -75,6 +99,12 @@ static epd_ret_t epd_wfh0420_dtm(epd_wfh0420_t *epd, uint8_t dtm_num, uint8_t *d
     return EPD_OK;
 }
 
+/**
+ * @brief Issue display update command and enter deep-sleep mode.
+ * Deep-sleep mode can only exits with a hardware reset.
+ * @param epd pointer to epd_wfh0420_t
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 static epd_ret_t epd_wfh0420_update_and_sleep(epd_wfh0420_t *epd) {
     EPD_ASSERT(epd);
     EPD_ASSERT(epd->cb.write_command_cb);
@@ -101,6 +131,17 @@ static epd_ret_t epd_wfh0420_update_and_sleep(epd_wfh0420_t *epd) {
     return EPD_OK;
 }
 
+/**
+ * @brief Initialize display, upload frame buffer and refresh.
+ * Then goes to deep-sleep mode to conserve power.
+ * This is the only function needs to be called by the user.
+ *
+ * @param epd pointer to epd_wfh0420_t
+ * @param coord pointer to epd_coord_t, x_start or x_end MUST be wrapped to 8 pixel boundaries.
+ * @param red_data red pixel data array, bit 0 for red, bit 1 for white
+ * @param bw_data black pixel data array, bit 0 for black, bit 1 for white
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 epd_ret_t epd_wfh0420_upload(epd_wfh0420_t *epd, epd_coord_t *coord, uint8_t *red_data, uint8_t *bw_data) {
     EPD_ERROR_CHECK(epd_wfh0420_init(epd));
     EPD_ERROR_CHECK(epd_wfh0420_partial(epd, coord));

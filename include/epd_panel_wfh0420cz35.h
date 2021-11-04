@@ -3,6 +3,11 @@
 
 #include "epd_common.h"
 
+/**
+ * @brief This display module has UC8176 controller IC, with BWR LUT stored in OTP.
+ *
+ */
+
 typedef struct {
     void    *user_data;
     epd_cb_t cb;

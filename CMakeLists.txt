@@ -4,7 +4,8 @@ project(epd-spi)
 
 set(EPD_SOURCES
     "src/epd_common.c"
-    "src/epd_wfh0420cz35.c"
+    "src/epd_panel_wfh0420cz35.c"
+    "src/epd_panel_gdew042t2.c"
 )
 
 set(EPD_INCLUDES
