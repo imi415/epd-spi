@@ -9,7 +9,7 @@ typedef struct {
 } oled_ewl1501aa_t;
 
 epd_ret_t oled_ewl1501aa_init(oled_ewl1501aa_t *ewl);
-epd_ret_t oled_ewl1501aa_upload(oled_ewl1501aa_t *ewl, uint8_t *data);
+epd_ret_t oled_ewl1501aa_upload(oled_ewl1501aa_t *oled, epd_coord_t *coord, uint8_t *data);
 epd_ret_t oled_ewl1501aa_power(oled_ewl1501aa_t *ewl, uint8_t on);
 
 #endif

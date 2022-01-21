@@ -40,11 +40,46 @@ static epd_ret_t oled_ewl1501aa_window(oled_ewl1501aa_t *oled, epd_coord_t *coor
         return EPD_FAIL;
     }
 
+    if (coord->x_end > 127 || coord->x_start > coord->x_end) {
+        return EPD_FAIL;
+    }
+
+    if (coord->y_end > 127 || coord->y_start > coord->y_end) {
+        return EPD_FAIL;
+    }
+
+    uint8_t col_start      = coord->x_start / 2;
+    uint8_t col_end        = coord->x_end / 2;
+
+    uint8_t col_cmd_buf[3] = {0x15, col_start, col_end};
+    uint8_t row_cmd_buf[3] = {0x75, coord->y_start, coord->y_end};
+    EPD_ERROR_CHECK(oled->cb.write_command_cb(oled->user_data, col_cmd_buf, 3));
+    EPD_ERROR_CHECK(oled->cb.write_command_cb(oled->user_data, row_cmd_buf, 3));
+
     return EPD_OK;
 }
 
-epd_ret_t oled_ewl1501aa_upload(oled_ewl1501aa_t *ewl, uint8_t *data) {
-    EPD_ERROR_CHECK(ewl->cb.write_data_cb(ewl->user_data, data, 8192));
+static inline uint32_t oled_ewl1501aa_data_size(epd_coord_t *coord) {
+    return (coord->x_end - coord->x_start) * (coord->y_end - coord->y_start) / 2;
+}
+
+epd_ret_t oled_ewl1501aa_upload(oled_ewl1501aa_t *oled, epd_coord_t *coord, uint8_t *data) {
+    uint32_t data_size = 8192;
+    if(coord != NULL) {
+        EPD_ERROR_CHECK(oled_ewl1501aa_window(oled, coord));
+        data_size = oled_ewl1501aa_data_size(coord);
+    }
+    EPD_ERROR_CHECK(oled->cb.write_data_cb(oled->user_data, data, data_size));
+
+    if(coord != NULL) {
+        epd_coord_t new_coord = {
+            .x_start = 0,
+            .x_end = 127,
+            .y_start = 0,
+            .y_end = 127,
+        };
+        EPD_ERROR_CHECK(oled_ewl1501aa_window(oled, &new_coord));
+    }
     return EPD_OK;
 }
 
