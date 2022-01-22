@@ -6,6 +6,7 @@ set(EPD_SOURCES
     "src/epd_common.c"
     "src/epd_panel_wfh0420cz35.c"
     "src/epd_panel_gdew042t2.c"
+    "src/lcd_panel_jlx256128g_920.c"
     "src/oled_panel_elw1501aa.c"
 )
 

@@ -27,14 +27,6 @@ static epd_ret_t oled_ewl1501aa_reset(oled_ewl1501aa_t *oled) {
     return EPD_OK;
 }
 
-epd_ret_t oled_ewl1501aa_init(oled_ewl1501aa_t *oled) {
-    EPD_ERROR_CHECK(oled_ewl1501aa_reset(oled));
-    EPD_ERROR_CHECK(epd_common_execute_sequence(&oled->cb, oled->user_data, ewl1501aa_init_sequence,
-                                                sizeof(ewl1501aa_init_sequence)));
-
-    return EPD_OK;
-}
-
 static epd_ret_t oled_ewl1501aa_window(oled_ewl1501aa_t *oled, epd_coord_t *coord) {
     if (coord->x_start % 2 != 0 || coord->x_end % 2 == 0) {
         return EPD_FAIL;
@@ -60,29 +52,63 @@ static epd_ret_t oled_ewl1501aa_window(oled_ewl1501aa_t *oled, epd_coord_t *coor
 }
 
 static inline uint32_t oled_ewl1501aa_data_size(epd_coord_t *coord) {
-    return (coord->x_end - coord->x_start) * (coord->y_end - coord->y_start) / 2;
+    return (coord->x_end - coord->x_start + 1) * (coord->y_end - coord->y_start + 1) / 2;
 }
 
+/**
+ * @brief Initialize OLED panel
+ * As OLEDs and LCDs need to be driven constantly, also with
+ * less overhead and higher data rate, initialization sequence
+ * are moved to this seperate function. Call this function before
+ * sending framebuffer data.
+ * @param oled pointer to oled_ewl1501aa_t
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
+epd_ret_t oled_ewl1501aa_init(oled_ewl1501aa_t *oled) {
+    EPD_ERROR_CHECK(oled_ewl1501aa_reset(oled));
+    EPD_ERROR_CHECK(epd_common_execute_sequence(&oled->cb, oled->user_data, ewl1501aa_init_sequence,
+                                                sizeof(ewl1501aa_init_sequence)));
+
+    return EPD_OK;
+}
+
+/**
+ * @brief Upload frame buffer to screen.
+ *
+ * @param oled pointer to oled_ewl1501aa_t
+ * @param coord pointer to epd_coord_t, can be NULL to upload full frame.
+ * @param data array pointer to new pixel data.
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 epd_ret_t oled_ewl1501aa_upload(oled_ewl1501aa_t *oled, epd_coord_t *coord, uint8_t *data) {
     uint32_t data_size = 8192;
-    if(coord != NULL) {
+    if (coord != NULL) {
         EPD_ERROR_CHECK(oled_ewl1501aa_window(oled, coord));
         data_size = oled_ewl1501aa_data_size(coord);
     }
     EPD_ERROR_CHECK(oled->cb.write_data_cb(oled->user_data, data, data_size));
 
-    if(coord != NULL) {
+    if (coord != NULL) {
         epd_coord_t new_coord = {
             .x_start = 0,
-            .x_end = 127,
+            .x_end   = 127,
             .y_start = 0,
-            .y_end = 127,
+            .y_end   = 127,
         };
         EPD_ERROR_CHECK(oled_ewl1501aa_window(oled, &new_coord));
     }
     return EPD_OK;
 }
 
+/**
+ * @brief Control the OLED drivers.
+ * LCDs and OLEDs needs to be constant driven in order to
+ * display a stable image, turn the drivers and source/gate scan on or off.
+ *
+ * @param oled pointer to oled_ewl1501aa_t
+ * @param on 0:off, anything else: on
+ * @return epd_ret_t EPD_OK for success, EPD_FAIL for error.
+ */
 epd_ret_t oled_ewl1501aa_power(oled_ewl1501aa_t *oled, uint8_t on) {
     uint8_t cmd[2] = {0xAE, 0x00};
     if (on) cmd[0] = 0xAF;
