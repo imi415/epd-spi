@@ -1,7 +1,7 @@
 #ifndef LCD_PANEL_JLX256128G_920_H
 #define LCD_PANEL_JLX256128G_920_H
 
-#include "epd_common.h"
+#include "epd-spi/epd_common.h"
 
 /**
  * @brief JLX256128G-920 LCD

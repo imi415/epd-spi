@@ -1,7 +1,7 @@
 #ifndef EPD_PRIVATE_H
 #define EPD_PRIVATE_H
 
-#include "epd_common.h"
+#include "epd-spi/epd_common.h"
 
 #define EPD_ASSERT(x) if(!(x)) for(;;) { /* ABORT. */}
 #define EPD_ERROR_CHECK(x) if(x != EPD_OK) return EPD_FAIL

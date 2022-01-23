@@ -1,4 +1,4 @@
-#include "lcd_panel_jlx256128g_920.h"
+#include "panel/lcd_jlx256128g_920.h"
 
 #include "epd_private.h"
 

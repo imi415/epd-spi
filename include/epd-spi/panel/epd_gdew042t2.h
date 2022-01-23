@@ -1,7 +1,7 @@
 #ifndef EPD_GDEW042T2_H
 #define EPD_GDEW042T2_H
 
-#include "epd_common.h"
+#include "epd-spi/epd_common.h"
 
 /**
  * @brief This display module has UC8176 controller IC,

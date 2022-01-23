@@ -1,4 +1,4 @@
-#include "epd_panel_wfh0420cz35.h"
+#include "panel/epd_wfh0420cz35.h"
 
 #include "epd_private.h"
 

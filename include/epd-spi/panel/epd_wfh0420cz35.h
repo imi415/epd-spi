@@ -1,7 +1,7 @@
 #ifndef EPD_WFH0420CZ35_H
 #define EPD_WFH0420CZ35_h
 
-#include "epd_common.h"
+#include "epd-spi/epd_common.h"
 
 /**
  * @brief This display module has UC8176 controller IC, with BWR LUT stored in OTP.

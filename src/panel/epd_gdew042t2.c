@@ -1,6 +1,6 @@
-#include "epd_panel_gdew042t2.h"
+#include "panel/epd_gdew042t2.h"
 
-#include "epd_panel_gdew042t2_lut.h"
+#include "panel/epd_gdew042t2_lut.h"
 #include "epd_private.h"
 
 #define DTM1 0x10
