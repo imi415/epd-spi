@@ -54,36 +54,45 @@ static inline epd_ret_t lcd_generic_ssd1289_reset(lcd_generic_ssd1289_t *lcd) {
 }
 
 static epd_ret_t lcd_generic_ssd1289_window(lcd_generic_ssd1289_t *lcd, epd_coord_t *coord) {
-    uint8_t tx_buf[3] = {0x44, 0x00, 0x00}; /* x_end is at higher byte. */
+    uint32_t ram_x_start, ram_x_end, ram_y_start, ram_y_end;
+
     if (lcd->dir == LCD_GENETIC_SSD1289_DIR_HORIZONTAL) {
-        tx_buf[1] = coord->y_end;
-        tx_buf[2] = coord->y_start;
+        ram_x_start = coord->y_start;
+        ram_x_end   = coord->y_end;
+        ram_y_start = coord->x_start;
+        ram_y_end   = coord->x_end;
     } else {
-        tx_buf[1] = coord->x_end;
-        tx_buf[2] = coord->x_start;
+        ram_x_start = coord->x_start;
+        ram_x_end   = coord->x_end;
+        ram_y_start = coord->y_start;
+        ram_y_end   = coord->y_end;
     }
+
+    uint8_t tx_buf[3];
+
+    tx_buf[0] = 0x44;
+    tx_buf[1] = ram_x_end;
+    tx_buf[2] = ram_x_start;
     EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 0x03));
 
     tx_buf[0] = 0x45;
-    if (lcd->dir == LCD_GENETIC_SSD1289_DIR_HORIZONTAL) {
-        tx_buf[1] = coord->x_start >> 8U;
-        tx_buf[2] = coord->x_start & 0xFFU;
-    } else {
-        tx_buf[1] = coord->y_start >> 8U;
-        tx_buf[2] = coord->y_start & 0xFFU;
-    }
-
+    tx_buf[1] = ram_y_start >> 8U;
+    tx_buf[2] = ram_y_start & 0xFFU;
     EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 0x03));
 
     tx_buf[0] = 0x46;
-    if (lcd->dir == LCD_GENETIC_SSD1289_DIR_HORIZONTAL) {
-        tx_buf[1] = coord->x_end >> 8U;
-        tx_buf[2] = coord->x_end & 0xFFU;
-    } else {
-        tx_buf[1] = coord->y_end >> 8U;
-        tx_buf[2] = coord->y_end & 0xFFU;
-    }
+    tx_buf[1] = ram_y_end >> 8U;
+    tx_buf[2] = ram_y_end & 0xFFU;
+    EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 0x03));
 
+    tx_buf[0] = 0x4E;
+    tx_buf[1] = 0x00;
+    tx_buf[2] = ram_x_start;
+    EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 0x03));
+
+    tx_buf[0] = 0x4F;
+    tx_buf[1] = ram_y_start >> 8U;
+    tx_buf[2] = ram_y_start & 0xFFU;
     EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 0x03));
 
     return EPD_OK;
