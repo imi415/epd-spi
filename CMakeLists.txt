@@ -7,6 +7,7 @@ set(EPD_SOURCES
     "src/driver/oled_ssd1327.c"
     "src/panel/epd_wfh0420cz35.c"
     "src/panel/epd_gdew042t2.c"
+    "src/panel/lcd_generic_ssd1289.c"
     "src/panel/lcd_jlx256128g_920.c"
     "src/panel/oled_elw1501aa.c"
     "src/panel/oled_zjy150s700.c"
