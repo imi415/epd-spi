@@ -10,7 +10,7 @@ static uint8_t lcd_generic_ssd1289_init_sequence[] = {
     0x02, 0x0D, 0x08, 0x0C, /* R0Dh - Power Control (3) */
     0x02, 0x0E, 0x2B, 0x00, /* R0Eh - Power Control (4) */
     0x02, 0x1E, 0x00, 0xB0, /* R1Eh - Power Control (5) */
-    0x02, 0x01, 0x2B, 0x3F, /* R01h - Driver Output Control */
+    0x02, 0x01, 0x6B, 0x3F, /* R01h - Driver Output Control */
     0x02, 0x02, 0x06, 0x00, /* R02h - LCD Driver AC Control */
     0x02, 0x10, 0x00, 0x00, /* R10h - Sleep Mode */
     0x02, 0x11, 0x60, 0x70, /* R11h - Entry Mode */
@@ -56,7 +56,7 @@ static inline epd_ret_t lcd_generic_ssd1289_reset(lcd_generic_ssd1289_t *lcd) {
 static epd_ret_t lcd_generic_ssd1289_window(lcd_generic_ssd1289_t *lcd, epd_coord_t *coord) {
     uint32_t ram_x_start, ram_x_end, ram_y_start, ram_y_end;
 
-    if (lcd->dir == LCD_GENETIC_SSD1289_DIR_HORIZONTAL) {
+    if (lcd->dir == LCD_GENERIC_SSD1289_DIR_HORIZONTAL) {
         ram_x_start = coord->y_start;
         ram_x_end   = coord->y_end;
         ram_y_start = coord->x_start;
@@ -109,11 +109,19 @@ epd_ret_t lcd_generic_ssd1289_init(lcd_generic_ssd1289_t *lcd) {
         tx_buf[2] |= (lcd->mode & 0x03) << 6U; /* TY[1:0] */
     }
 
-    if (lcd->dir == LCD_GENERIC_SSD1289_DIR_VERTICAL) {
+    if (lcd->dir == LCD_GENERIC_SSD1289_DIR_HORIZONTAL) {
         tx_buf[2] |= 1 << 3U;
     }
 
     EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 3U));
+
+    if (lcd->dir == LCD_GENERIC_SSD1289_DIR_VERTICAL) {
+        tx_buf[0] = 0x01;
+        tx_buf[1] = 0x2B;
+        tx_buf[2] = 0x3F;
+
+        EPD_ERROR_CHECK(lcd->cb.write_command_cb(lcd->user_data, tx_buf, 3U));
+    }
 
     return EPD_OK;
 }

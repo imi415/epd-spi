@@ -16,7 +16,7 @@ typedef enum {
 } lcd_generic_ssd1289_mode_t;
 
 typedef enum {
-    LCD_GENETIC_SSD1289_DIR_HORIZONTAL = 0,
+    LCD_GENERIC_SSD1289_DIR_HORIZONTAL = 0,
     LCD_GENERIC_SSD1289_DIR_VERTICAL   = 1,
 } lcd_generic_ssd1289_dir_t;
 
