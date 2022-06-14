@@ -13,6 +13,9 @@ static uint8_t lcd_generic_ssd1289_init_sequence[] = {
     0x02, 0x01, 0x6B, 0x3F, /* R01h - Driver Output Control */
     0x02, 0x02, 0x06, 0x00, /* R02h - LCD Driver AC Control */
     0x02, 0x10, 0x00, 0x00, /* R10h - Sleep Mode */
+};
+
+static uint8_t lcd_generic_ssd1289_init_sequence_2[] = {
     0x02, 0x11, 0x60, 0x70, /* R11h - Entry Mode */
     0x02, 0x05, 0x00, 0x00, /* R05h - Compare Register (1) */
     0x02, 0x06, 0x00, 0x00, /* R06h - Compare Register (2) */
@@ -102,6 +105,11 @@ epd_ret_t lcd_generic_ssd1289_init(lcd_generic_ssd1289_t *lcd) {
     EPD_ERROR_CHECK(lcd_generic_ssd1289_reset(lcd));
     EPD_ERROR_CHECK(epd_common_execute_sequence(&lcd->cb, lcd->user_data, lcd_generic_ssd1289_init_sequence,
                                                 sizeof(lcd_generic_ssd1289_init_sequence)));
+
+    EPD_ERROR_CHECK(lcd->cb.delay_cb(lcd->user_data, 30));
+
+    EPD_ERROR_CHECK(epd_common_execute_sequence(&lcd->cb, lcd->user_data, lcd_generic_ssd1289_init_sequence_2,
+                                                sizeof(lcd_generic_ssd1289_init_sequence_2)));
 
     uint8_t tx_buf[3] = {0x11, 0x60, 0x30}; /* Entry Mode, DFM[1:0] = 0b10 */
     if (lcd->mode != LCD_GENERIC_SSD1289_MODE_RGB565) {
